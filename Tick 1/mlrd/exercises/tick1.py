@@ -10,7 +10,8 @@ def read_lexicon(filename: str) -> Dict[str, int]:
     @param filename: path to file
     @return: dictionary from word to sentiment (+1 or -1 for positive or negative sentiments respectively).
     """
-    pass
+    with open(filename, "r") as f:
+        return {n[0]: [-1, 1][n[2] == "positive"] for n in map(lambda x: list(map(lambda y: y.split("=")[1], x.strip().split())), f.readlines())}
 
 
 def predict_sentiment(review: List[str], lexicon: Dict[str, int]) -> int:

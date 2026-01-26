@@ -34,7 +34,7 @@ def accuracy(pred: List[int], true: List[int]) -> float:
     @param true: list of correct sentiment for each review
     @return: the overall accuracy of the predictions
     """
-    pass
+    return sum(1 for p, t in zip(pred, true) if p == t) / len(true)
 
 
 def predict_sentiment_improved(review: List[str], lexicon: Dict[str, int]) -> int:

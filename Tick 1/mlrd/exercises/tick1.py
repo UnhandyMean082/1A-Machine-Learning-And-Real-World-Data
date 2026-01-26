@@ -46,7 +46,7 @@ def predict_sentiment_improved(review: List[str], lexicon: Dict[str, int]) -> in
     @param lexicon: dictionary from word to sentiment (+1 or -1 for positive or negative sentiments respectively).
     @return: calculated sentiment for each review (+1, -1 for positive and negative sentiments, respectively).
     """
-    pass
+    return sum(lexicon.get(word, 0) for word in review) >= 8 and 1 or -1
 
 
 def main():

@@ -1,6 +1,7 @@
 from typing import List, Dict
 import os
 from utils.sentiment_detection import read_tokens, load_reviews
+import math
 
 
 def read_lexicon(filename: str) -> Dict[str, int]:
@@ -37,6 +38,17 @@ def accuracy(pred: List[int], true: List[int]) -> float:
     return sum(1 for p, t in zip(pred, true) if p == t) / len(true)
 
 
+def read_lexicon_improved(filename: str) -> Dict[str, int]:
+    """
+    Read the lexicon from a given path, scaling weight by strength.
+
+    @param filename: path to file
+    @return: dictionary from word to sentiment (+1 or -1 for positive or negative sentiments respectively).
+    """
+    with open(filename, "r") as f:
+        return {n[0]: (n[2] == "positive" and 1 or -1) * (n[1] == "strong" and 2 or 1) for n in map(lambda x: list(map(lambda y: y.split("=")[1], x.strip().split())), f.readlines())}
+
+
 def predict_sentiment_improved(review: List[str], lexicon: Dict[str, int]) -> int:
     """
     Use the training data to improve your classifier, perhaps by choosing an offset for the classifier cutoff which
@@ -46,7 +58,7 @@ def predict_sentiment_improved(review: List[str], lexicon: Dict[str, int]) -> in
     @param lexicon: dictionary from word to sentiment (+1 or -1 for positive or negative sentiments respectively).
     @return: calculated sentiment for each review (+1, -1 for positive and negative sentiments, respectively).
     """
-    return sum(lexicon.get(word, 0) for word in review) >= 8 and 1 or -1
+    return sum(lexicon.get(word, 0) for word in review) >= 14 and 1 or -1
 
 
 def main():
@@ -62,7 +74,9 @@ def main():
     acc1 = accuracy(pred1, [x['sentiment'] for x in review_data])
     print(f"Your accuracy: {acc1}")
 
-    pred2 = [predict_sentiment_improved(t, lexicon) for t in tokenized_data]
+    improved_lexicon = read_lexicon_improved(os.path.join('data', 'sentiment_detection', 'sentiment_lexicon'))
+
+    pred2 = [predict_sentiment_improved(t, improved_lexicon) for t in tokenized_data]
     acc2 = accuracy(pred2, [x['sentiment'] for x in review_data])
     print(f"Your improved accuracy: {acc2}")
 

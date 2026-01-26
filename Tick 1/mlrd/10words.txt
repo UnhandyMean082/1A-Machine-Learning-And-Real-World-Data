@@ -1,0 +1,10 @@
+word=best intensity=strong polarity=positive
+word=genuine intensity=strong polarity=positive
+word=emotional intensity=strong polarity=positive
+word=potential intensity=weak polarity=negative
+word=bland intensity=strong polarity=negative
+word=lacking intensity=strong polarity=negative
+word=uncomfortable intensity=weak polarity=negative
+word=dry intensity=weak polarity=negative
+word=chemistry intensity=strong polarity=positive
+word=recommend intensity=strong polarity=positive

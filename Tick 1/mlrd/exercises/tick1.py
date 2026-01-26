@@ -11,7 +11,7 @@ def read_lexicon(filename: str) -> Dict[str, int]:
     @return: dictionary from word to sentiment (+1 or -1 for positive or negative sentiments respectively).
     """
     with open(filename, "r") as f:
-        return {n[0]: [-1, 1][n[2] == "positive"] for n in map(lambda x: list(map(lambda y: y.split("=")[1], x.strip().split())), f.readlines())}
+        return {n[0]: n[2] == "positive" and 1 or -1 for n in map(lambda x: list(map(lambda y: y.split("=")[1], x.strip().split())), f.readlines())}
 
 
 def predict_sentiment(review: List[str], lexicon: Dict[str, int]) -> int:
@@ -23,7 +23,7 @@ def predict_sentiment(review: List[str], lexicon: Dict[str, int]) -> int:
     @param lexicon: dictionary from word to sentiment (+1 or -1 for positive or negative sentiments respectively).
     @return: calculated sentiment for each review (+1 or -1 for positive or negative sentiments respectively).
     """
-    pass
+    return sum(lexicon.get(word, 0) for word in review) >= 0 and 1 or -1
 
 
 def accuracy(pred: List[int], true: List[int]) -> float:

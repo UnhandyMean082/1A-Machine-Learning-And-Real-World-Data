@@ -14,8 +14,8 @@ def calculate_class_log_probabilities(training_data: List[Dict[str, Union[List[s
         'sentiment'. 'text' is the tokenized review and 'sentiment' is +1 or -1, for positive and negative sentiments.
     @return: dictionary from sentiment to prior log probability
     """
-    return {+1: sum(1 for x in training_data if x['sentiment'] == +1)/len(training_data),
-            -1: sum(1 for x in training_data if x['sentiment'] == -1)/len(training_data)}
+    return {+1: math.log(sum(1 for x in training_data if x['sentiment'] == +1)/len(training_data)),
+            -1: math.log(sum(1 for x in training_data if x['sentiment'] == -1)/len(training_data))}
 
 
 def calculate_unsmoothed_log_probabilities(training_data: List[Dict[str, Union[List[str], int]]]) \

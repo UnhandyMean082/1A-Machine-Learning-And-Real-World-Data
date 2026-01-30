@@ -27,7 +27,13 @@ def calculate_unsmoothed_log_probabilities(training_data: List[Dict[str, Union[L
         'sentiment'. 'text' is the tokenized review and 'sentiment' is +1 or -1, for positive and negative sentiments.
     @return: dictionary from sentiment to Dictionary of tokens with respective log probability
     """
-    pass
+    out = {+1: {},
+           -1: {}}
+    for review in training_data:
+        for token in review['text']:
+            if token.isalpha():
+                out[review['sentiment']][token] = out[review['sentiment']].get(token, 0) + 1
+    return dict((k, dict((tk, math.log(tv/sum(out[k].values()))) for (tk, tv) in out[k].items())) for k in out.keys())
 
 
 def calculate_smoothed_log_probabilities(training_data: List[Dict[str, Union[List[str], int]]]) \

@@ -33,7 +33,8 @@ def calculate_unsmoothed_log_probabilities(training_data: List[Dict[str, Union[L
         for token in review['text']:
             if token.isalpha():
                 out[review['sentiment']][token] = out[review['sentiment']].get(token, 0) + 1
-    return dict((k, dict((tk, math.log(tv/sum(out[k].values()))) for (tk, tv) in out[k].items())) for k in out.keys())
+    totals = {k: sum(out[k].values()) for k in out.keys()}
+    return dict((k, dict((ik, math.log(iv/totals[k])) for (ik, iv) in out[k].items())) for k in out.keys())
 
 
 def calculate_smoothed_log_probabilities(training_data: List[Dict[str, Union[List[str], int]]]) \

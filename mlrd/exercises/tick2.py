@@ -60,7 +60,7 @@ def predict_sentiment_nbc(review: List[str], log_probabilities: Dict[int, Dict[s
     @param class_log_probabilities: dictionary from sentiment to prior log probability
     @return: predicted sentiment [-1, 1] for the given review
     """
-    pass
+    return [-1, +1][(class_log_probabilities[+1] + sum([log_probabilities[+1].get(word, 0) for word in review])) >= (class_log_probabilities[-1] + sum([log_probabilities[-1].get(word, 0) for word in review]))]
 
 
 def main():

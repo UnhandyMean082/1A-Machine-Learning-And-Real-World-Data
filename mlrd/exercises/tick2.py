@@ -14,11 +14,10 @@ def calculate_class_log_probabilities(training_data: List[Dict[str, Union[List[s
         'sentiment'. 'text' is the tokenized review and 'sentiment' is +1 or -1, for positive and negative sentiments.
     @return: dictionary from sentiment to prior log probability
     """
-    return {+1: math.log(sum(1 for x in training_data if x['sentiment'] == +1)/len(training_data)),
-            -1: math.log(sum(1 for x in training_data if x['sentiment'] == -1)/len(training_data))}
+    return {s: math.log(sum(1 for x in training_data if x['sentiment'] == s)/len(training_data)) for s in [+1, -1]}
 
 
-def calculate_unsmoothed_log_probabilities(training_data: List[Dict[str, Union[List[str], int]]]) \
+def calculate_unsmoothed_log_probabilities(training_data: List[Dict[str, Union[List[str], int]]], smoothed: int=0) \
         -> Dict[int, Dict[str, float]]:
     """
     Calculate the unsmoothed log likelihood log (P(x|c)) of a word in the vocabulary given a sentiment.
@@ -29,12 +28,17 @@ def calculate_unsmoothed_log_probabilities(training_data: List[Dict[str, Union[L
     """
     out = {+1: {},
            -1: {}}
+    vocab = set()
     for review in training_data:
         for token in review['text']:
             if token.isalpha():
                 out[review['sentiment']][token] = out[review['sentiment']].get(token, 0) + 1
+                vocab.add(token)
     totals = {k: sum(out[k].values()) for k in out.keys()}
-    return dict((k, dict((ik, math.log(iv/totals[k])) for (ik, iv) in out[k].items())) for k in out.keys())
+    if smoothed:
+        for k in out.keys():
+            out[k]['UNKNOWN'] = 0
+    return dict((k, dict((ik, math.log((iv + smoothed)/(totals[k] + smoothed * len(vocab)))) for (ik, iv) in out[k].items())) for k in out.keys())
 
 
 def calculate_smoothed_log_probabilities(training_data: List[Dict[str, Union[List[str], int]]]) \
@@ -47,7 +51,7 @@ def calculate_smoothed_log_probabilities(training_data: List[Dict[str, Union[Lis
         'sentiment'. 'text' is the tokenized review and 'sentiment' is +1 or -1, for positive and negative sentiments.
     @return: Dictionary from sentiment to Dictionary of tokens with respective log probability
     """
-    pass
+    return calculate_unsmoothed_log_probabilities(training_data, smoothed=1)
 
 
 def predict_sentiment_nbc(review: List[str], log_probabilities: Dict[int, Dict[str, float]],
@@ -60,7 +64,7 @@ def predict_sentiment_nbc(review: List[str], log_probabilities: Dict[int, Dict[s
     @param class_log_probabilities: dictionary from sentiment to prior log probability
     @return: predicted sentiment [-1, 1] for the given review
     """
-    return [-1, +1][(class_log_probabilities[+1] + sum([log_probabilities[+1].get(word, 0) for word in review])) >= (class_log_probabilities[-1] + sum([log_probabilities[-1].get(word, 0) for word in review]))]
+    return [-1, +1][(class_log_probabilities[+1] + sum([log_probabilities[+1].get(word, log_probabilities[+1].get('UNKNOWN', 0)) for word in review if word.isalpha()])) >= (class_log_probabilities[-1] + sum([log_probabilities[-1].get(word, log_probabilities[-1].get('UNKNOWN', 0)) for word in review if word.isalpha()]))]
 
 
 def main():
